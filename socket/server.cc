@@ -3,6 +3,7 @@
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <pthread.h>
+#include <cstdio>
 
 int poll_fd = -1;
 int pipefd[2];
@@ -16,6 +17,7 @@ void do_poll() {
         int n = epoll_wait(poll_fd, events, 8, -1);
         for (int i = 0; i < n; i++) {
             int fd = events[i].data.fd;
+            printf("polled fd %d\n", fd);
             pthread_mutex_lock(&set_mutex);
             if (!read_fds.count(fd))
                 continue;
@@ -23,13 +25,18 @@ void do_poll() {
             if (events[i].events & EPOLLIN) {
                 char buf[128];
                 int len;
-                while ((len = read(fd, buf, 128)) > 0) {
+                while ((len = recv(fd, buf, 128, ::MSG_DONTWAIT)) > 0) {
                     for (int s = 0; s < len; s++)
                         putchar(buf[s]);
                 }
+                printf("last read result %d\n", len);
             }
             if (events[i].events & EPOLLRDHUP) {
                 printf("remote drop?\n");
+                int len;
+                char buf[128];
+                len = recv(fd, buf, 128, MSG_DONTWAIT);
+                printf("after drop %d\n", len);
             }
         }
 

@@ -13,7 +13,6 @@ void do_poll() {
 }
 
 int main(int argc, char* argv[]) {
-    signal(SIGPIPE, SIG_IGN);
     poll_fd = epoll_create(0);
     boost::thread thread_poll(do_poll);
    
@@ -44,7 +43,7 @@ int main(int argc, char* argv[]) {
     while (true) {
         char buf[255];
         sprintf(buf, "message %s:%d\n", argv[1], cnt++);
-        int sz = write(socket_fd, buf, strlen(buf)+1);
+        int sz = send(socket_fd, buf, strlen(buf)+1, ::MSG_NOSIGNAL);
         if (sz == 0) {
             printf("write return 0\n");
             return 1;

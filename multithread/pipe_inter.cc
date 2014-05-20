@@ -4,9 +4,10 @@
 #include <stdio.h>
 #include <boost/thread.hpp>
 int pipefd[2];
+int pollfd;
 void thread_func() {
     while (1) {
-        if (pipefd[1] != 0) {
+        if (pipefd[0] != 0) {
             char b;
             write(pipefd[1], &b, 1);
         }
@@ -23,7 +24,7 @@ int main() {
     signal(SIGINT, sig);
     boost::thread thr(thread_func);
     pipe(pipefd);
-    int pollfd = epoll_create(255);
+    pollfd = epoll_create(255);
     epoll_event ev;
     ev.events = EPOLLET | EPOLLIN;
     ev.data.fd = pipefd[0];
