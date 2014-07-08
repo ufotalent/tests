@@ -3,6 +3,7 @@
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <signal.h>
+#include <cstdio>
 
 int poll_fd;
 void do_poll() {

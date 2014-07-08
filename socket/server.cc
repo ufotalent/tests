@@ -17,7 +17,7 @@ void do_poll() {
         int n = epoll_wait(poll_fd, events, 8, -1);
         for (int i = 0; i < n; i++) {
             int fd = events[i].data.fd;
-            printf("polled fd %d\n", fd);
+            printf("polled fd %d mask %u\n", fd, events[i].events);
             pthread_mutex_lock(&set_mutex);
             if (!read_fds.count(fd))
                 continue;
@@ -82,7 +82,7 @@ int main() {
         read_fds.insert(read_fd);
         pthread_mutex_unlock(&set_mutex);
         epoll_event e;
-        e.events = EPOLLIN | EPOLLRDHUP | EPOLLET;
+        e.events = EPOLLIN | EPOLLRDHUP | EPOLLET | EPOLLOUT;
         e.data.fd = read_fd;
         epoll_ctl(poll_fd, EPOLL_CTL_ADD, read_fd, &e);
     }

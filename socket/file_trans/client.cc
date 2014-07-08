@@ -3,6 +3,7 @@
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <signal.h>
+#include <cstdio>
 
 int poll_fd;
 void do_poll() {
@@ -23,7 +24,7 @@ int main(int argc, char* argv[]) {
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_port =  htons(10086);
-    inet_pton(AF_INET, "10.76.0.129", &addr.sin_addr);
+    inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
     printf("%d %x\n", socket_fd, addr.sin_addr.s_addr);
     if (connect(socket_fd, (sockaddr*)&addr, sizeof(addr))) {
         perror("connect failed");
