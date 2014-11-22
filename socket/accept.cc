@@ -53,9 +53,18 @@ int main() {
                     perror("accept failed");
                     continue;
                 }
+                close(read_fd);
+                while (1);
                 char dst[20];
                 inet_ntop(AF_INET, &peer.sin_addr, dst, sizeof(dst));
                 printf("accepted from %s %d\n", dst, peer.sin_port);
+
+                sockaddr_in me;
+                me.sin_port = 0;
+                socklen_t me_len = sizeof(me);
+                getsockname(socket_fd, (sockaddr*)&me, &me_len);
+                inet_ntop(AF_INET, &me.sin_addr, dst, sizeof(dst));
+                printf("me %s %d\n", dst, me.sin_port);
 
                 char buf[256];
                 int n;
